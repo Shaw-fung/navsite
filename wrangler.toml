@@ -1,0 +1,14 @@
+name = "NavSite"  # 替换为你的 Worker 名称
+main = "worker.js"  # 入口文件路径
+compatibility_date = "2025-07-13"
+
+[build]
+command = "echo 'No build needed'"
+
+[env.production]
+workers_dev = true
+
+# 如果你使用 KV 存储，添加以下配置
+kv_namespaces = [
+  { binding = "NAV_DB", id = "NAV_DB" }
+]
