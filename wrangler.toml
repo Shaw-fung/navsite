@@ -1,4 +1,4 @@
-name = "NavSite"  # 替换为你的 Worker 名称
+name = "nav-site"  # 替换为你的 Worker 名称
 main = "worker.js"  # 入口文件路径
 compatibility_date = "2025-07-13"
 
