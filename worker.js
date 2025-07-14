@@ -698,15 +698,12 @@ async function getCategories() {
     const categoriesJson = await NAV_DB.get('categories');
     return categoriesJson ? JSON.parse(categoriesJson) : [
       { name: '搜索引擎', icon: 'fa-search', isPrivate: false },
-      { name: '推荐站点', icon: 'fa-star', isPrivate: false },
-      { name: '综合名站', icon: 'fa-link', isPrivate: false },
-      { name: '点击榜单', icon: 'fa-fire', isPrivate: false }
+      { name: '综合名站', icon: 'fa-link', isPrivate: false }
     ];
   } catch (error) {
     console.error('获取分类失败:', error);
     return [
       { name: '搜索引擎', icon: 'fa-search', isPrivate: false },
-      { name: '推荐站点', icon: 'fa-star', isPrivate: false },
       { name: '综合名站', icon: 'fa-link', isPrivate: false }
     ];
   }
