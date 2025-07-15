@@ -1038,8 +1038,13 @@ async function showAdminDashboard() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -1056,6 +1061,10 @@ async function showAdminDashboard() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+	    <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>仪表盘</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -1128,6 +1137,70 @@ async function showAdminDashboard() {
         `).join('')}
       </div>
     </div>
+	    <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
   </body>
   </html>
   `;
@@ -1153,8 +1226,13 @@ async function showLinkManagement() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -1171,6 +1249,10 @@ async function showLinkManagement() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+	    <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>链接管理</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -1313,7 +1395,70 @@ async function showLinkManagement() {
         </form>
       </div>
     </div>
-    
+        <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
     <script>
       function openEditModal(id) {
         const links = ${JSON.stringify(links)};
@@ -1363,8 +1508,13 @@ async function showCategoryManagement() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -1381,6 +1531,10 @@ async function showCategoryManagement() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+	    <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>分类管理</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -1468,7 +1622,70 @@ async function showCategoryManagement() {
         </form>
       </div>
     </div>
-    
+        <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
     <script>
       function openEditCategoryModal(name, icon, isPrivate) {
         document.getElementById('editOldName').value = name;
@@ -1511,8 +1728,13 @@ async function showSearchEngineManagement() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -1529,6 +1751,10 @@ async function showSearchEngineManagement() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+        <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>搜索引擎管理</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -1614,7 +1840,70 @@ async function showSearchEngineManagement() {
         </form>
       </div>
     </div>
-    
+        <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
     <script>
       function openEditModal(name) {
         const engines = ${JSON.stringify(engines)};
@@ -2228,6 +2517,88 @@ async function showAdminCss() {
   .restore-form input[type="file"] {
     margin-bottom: 15px;
   }
+  
+  /* 添加侧边栏响应式样式 */
+  @media (max-width: 992px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      position: fixed;
+      height: 100vh;
+    }
+    
+    .sidebar.sidebar-active {
+      transform: translateX(0);
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .main-content {
+      margin-left: 0;
+      width: 100%;
+      transition: margin-left 0.3s ease;
+    }
+    
+    .menu-toggle {
+      display: flex !important;
+    }
+  }
+  
+  /* 添加菜单按钮样式 */
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: all 0.3s;
+  }
+  
+  .menu-toggle:hover {
+    background: var(--dark-primary);
+    transform: scale(1.05);
+  }
+  
+  /* 添加遮罩层样式 */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .sidebar-overlay.sidebar-active {
+    display: block;
+    opacity: 1;
+  }
+  
+  /* 侧边栏关闭按钮（移动端） */
+  .sidebar-close {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 992px) {
+    .sidebar-close {
+      display: block;
+    }
+  }
   `;
   
   return new Response(css, {
@@ -2250,8 +2621,13 @@ async function showSettingsPage() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -2268,6 +2644,10 @@ async function showSettingsPage() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+        <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>系统设置</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -2356,6 +2736,70 @@ async function showSettingsPage() {
         </div>
       </div>
     </div>
+	    <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
   </body>
   </html>
   `;
@@ -2378,8 +2822,13 @@ async function showBackupPage() {
     <link rel="stylesheet" href="/admin/main.css">
   </head>
   <body>
+    <!-- 添加遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </div>
       <div class="sidebar-header">
         <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
@@ -2396,6 +2845,10 @@ async function showBackupPage() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
+        <!-- 添加菜单按钮 -->
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
         <h2>数据备份</h2>
         <div class="user-menu">
           <div class="user-avatar">A</div>
@@ -2424,7 +2877,70 @@ async function showBackupPage() {
         </div>
       </div>
     </div>
-    
+        <script>
+      // 侧边栏控制逻辑
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      // 切换侧边栏状态
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        // 添加/移除body滚动锁定
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // 关闭侧边栏
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      // 事件监听
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      // 点击侧边栏外部关闭
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 键盘ESC键关闭
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      // 窗口大小变化时调整
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          // 大屏幕时确保侧边栏可见
+          sidebar.classList.remove('sidebar-active');
+          sidebarOverlay.classList.remove('sidebar-active');
+          document.body.style.overflow = '';
+        } else {
+          // 小屏幕时默认隐藏
+          closeSidebar();
+        }
+      });
+    </script>
     <script>
       document.getElementById('backupBtn').addEventListener('click', async function() {
         try {
