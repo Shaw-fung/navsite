@@ -6,11 +6,6 @@ addEventListener('fetch', event => {
 // 主请求处理
 async function handleRequest(request) {
   const url = new URL(request.url);
-  
-  // 微信验证
-  if (url.pathname === '/tencent10279378791095334123.txt') {
-    return YanZhenWX();
-  }
 
   // 处理背景图片请求
   if (url.pathname === '/background-image') {
@@ -793,17 +788,6 @@ async function getFeaturedLinks(limit = 12) {
     console.error('获取推荐链接失败:', error);
     return [];
   }
-}
-
-// 显示管理员登录页面
-async function YanZhenWX() {
-  const html = `
-  4616692055878630450
-  `;
-  
-  return new Response(html, {
-    headers: { 'Content-Type': 'text/html' }
-  });
 }
 
 // 显示管理员登录页面
