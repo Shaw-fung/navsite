@@ -1030,7 +1030,7 @@ async function showAdminDashboard() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard" class="active"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1218,7 +1218,7 @@ async function showLinkManagement() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1500,7 +1500,7 @@ async function showCategoryManagement() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1720,7 +1720,7 @@ async function showSearchEngineManagement() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -2006,6 +2006,11 @@ async function showAdminCss() {
   .nav-links a i {
     width: 24px;
     text-align: center;
+  }
+  
+  a.backhome {
+    color: white;
+    text-decoration: none;
   }
   
   /* 主内容区域 */
@@ -2613,7 +2618,7 @@ async function showSettingsPage() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -2814,7 +2819,7 @@ async function showBackupPage() {
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> 导航系统</h1>
+        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
