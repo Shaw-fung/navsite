@@ -3745,6 +3745,7 @@ async function showFrontend(request) {
     
     <footer class="footer">
       <p>${settings.copyright} Powered by <a href="https://paoto.com">paoto.com</a>.</p>
+	  <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</p>
       <p>${settings.icpNumber}</p> 
     </footer>
     
