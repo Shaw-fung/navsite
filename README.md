@@ -1,4 +1,4 @@
-# navsite
+# NavSite
 
 ## 一个基于cloudflare worker，cloudflare kv搭建的带后台管理导航站。
 
