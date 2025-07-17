@@ -10,5 +10,5 @@ workers_dev = true
 
 # 如果你使用 KV 存储，添加以下配置
 kv_namespaces = [
-  { binding = "NAV_DB", id = "a6d1c77c73c54c3fbcbf8a1830726f7e" }
+  { binding = "NAV_DB", id = a6d1c77c73c54c3fbcbf8a1830726f7e }
 ]
