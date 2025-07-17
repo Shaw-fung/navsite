@@ -3718,10 +3718,10 @@ async function showFrontend(request) {
     <footer class="footer">
       <p>${settings.copyright}</p>
       <p>${settings.icpNumber}</p> 
-       <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a></p>
+       
       <!-- 版本信息区域 -->
       <div class="version-info" id="versionInfo">
-        当前版本: <span id="currentVersion">v1.0.0</span>
+        <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a>.</p>当前版本: <span id="currentVersion">v1.0.0</span>
         <div id="updateMessage"></div>
       </div>
     </footer>
