@@ -1,54 +1,64 @@
 // worker.js
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-});
+export default {
+  async fetch(request, env) {
+    // 将 KV 绑定到全局对象
+    globalThis.NAV_DB = env.NAV_DB;
+    
+    const url = new URL(request.url);
+    
+    // 微信验证
+    if (url.pathname === '/tencent10279378791095334123.txt') {
+      return YanZhenWX();
+    }
+
+    // 处理背景图片请求
+    if (url.pathname === '/background-image') {
+      return handleBackgroundImage(request);
+    }
+
+    // 处理 sea.webp 请求
+    if (url.pathname === '/static/images/sea.webp') {
+      return fetch('https://duibi.top/static/images/sea.webp');
+    }
+
+    // 处理 favicon.ico 请求
+    if (url.pathname === '/favicon.ico') {
+      return handleFavicon(request);
+    }
+    
+    // Bing每日图片代理
+    if (url.pathname === '/bing-image') {
+      return fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1');
+    }
+    
+    // 后台管理路由
+    if (url.pathname.startsWith('/admin')) {
+      return handleAdminRoutes(request);
+    }
+    
+    // 处理API请求
+    if (url.pathname.startsWith('/api')) {
+      return handleApiRoutes(request);
+    }
+    
+    // 数据库备份
+    if (url.pathname === '/admin/backup') {
+      return handleBackup(request);
+    }
+    
+    // 数据库还原
+    if (url.pathname === '/admin/restore' && request.method === 'POST') {
+      return handleRestore(request);
+    }
+    
+    // 前台页面
+    return showFrontend(request);
+  }
+};
 
 // 主请求处理
 async function handleRequest(request) {
-  const url = new URL(request.url);
-
-  // 处理背景图片请求
-  if (url.pathname === '/background-image') {
-    return handleBackgroundImage(request);
-  }
-
-  // 处理 sea.webp 请求
-  if (url.pathname === '/static/images/sea.webp') {
-    return fetch('https://duibi.top/static/images/sea.webp');
-  }
-
-  // 处理 favicon.ico 请求
-  if (url.pathname === '/favicon.ico') {
-    return handleFavicon(request);
-  }
-  
-  // Bing每日图片代理
-  if (url.pathname === '/bing-image') {
-    return fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1');
-  }
-  
-  // 后台管理路由
-  if (url.pathname.startsWith('/admin')) {
-    return handleAdminRoutes(request);
-  }
-  
-  // 处理API请求
-  if (url.pathname.startsWith('/api')) {
-    return handleApiRoutes(request);
-  }
-  
-  // 数据库备份
-  if (url.pathname === '/admin/backup') {
-    return handleBackup(request);
-  }
-  
-  // 数据库还原
-  if (url.pathname === '/admin/restore' && request.method === 'POST') {
-    return handleRestore(request);
-  }
-  
-  // 前台页面
-  return showFrontend(request);
+  // 此函数已整合到主fetch处理中
 }
 
 // 处理背景图片
@@ -214,9 +224,8 @@ async function handleAdminRoutes(request) {
 
 // API路由处理
 async function handleApiRoutes(request) {
-
   const url = new URL(request.url);
-
+  
   // 增加点击量
   if (url.pathname === '/api/click' && request.method === 'POST') {
     const data = await request.json();
@@ -224,8 +233,8 @@ async function handleApiRoutes(request) {
       await incrementClickCount(data.id);
       return new Response(JSON.stringify({ success: true }), {
         headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
         }
       });
     }
@@ -244,7 +253,7 @@ async function handleApiRoutes(request) {
   if (!isAuthenticated) {
     return Response.redirect(new URL('/admin/login', request.url).toString(), 302);
   }
-  
+
   // 获取分类
   if (url.pathname === '/api/categories' && request.method === 'GET') {
     const categories = await getCategories();
@@ -360,7 +369,7 @@ async function handleAddLink(request) {
     });
     
     // 保存到KV
-    await NAV_DB.put('links', JSON.stringify(links));
+    await globalThis.NAV_DB.put('links', JSON.stringify(links));
     
     return Response.redirect(new URL('/admin/links', request.url).toString(), 303);
   } catch (error) {
@@ -404,7 +413,7 @@ async function handleEditLink(request) {
     });
     
     // 保存到KV
-    await NAV_DB.put('links', JSON.stringify(updatedLinks));
+    await globalThis.NAV_DB.put('links', JSON.stringify(updatedLinks));
     
     return Response.redirect(new URL('/admin/links', request.url).toString(), 303);
   } catch (error) {
@@ -429,7 +438,7 @@ async function handleDeleteLink(request) {
     const updatedLinks = links.filter(link => link.id !== id);
     
     // 保存到KV
-    await NAV_DB.put('links', JSON.stringify(updatedLinks));
+    await globalThis.NAV_DB.put('links', JSON.stringify(updatedLinks));
     
     return Response.redirect(new URL('/admin/links', request.url).toString(), 303);
   } catch (error) {
@@ -461,7 +470,7 @@ async function handleAddCategory(request) {
     categories.push({ name, icon, isPrivate });
     
     // 保存到KV
-    await NAV_DB.put('categories', JSON.stringify(categories));
+    await globalThis.NAV_DB.put('categories', JSON.stringify(categories));
     
     return Response.redirect(new URL('/admin/categories', request.url).toString(), 303);
   } catch (error) {
@@ -505,8 +514,8 @@ async function handleEditCategory(request) {
     });
     
     // 保存更新
-    await NAV_DB.put('categories', JSON.stringify(updatedCategories));
-    await NAV_DB.put('links', JSON.stringify(updatedLinks));
+    await globalThis.NAV_DB.put('categories', JSON.stringify(updatedCategories));
+    await globalThis.NAV_DB.put('links', JSON.stringify(updatedLinks));
     
     return Response.redirect(new URL('/admin/categories', request.url).toString(), 303);
   } catch (error) {
@@ -540,8 +549,8 @@ async function handleDeleteCategory(request) {
     });
     
     // 保存更新
-    await NAV_DB.put('categories', JSON.stringify(updatedCategories));
-    await NAV_DB.put('links', JSON.stringify(updatedLinks));
+    await globalThis.NAV_DB.put('categories', JSON.stringify(updatedCategories));
+    await globalThis.NAV_DB.put('links', JSON.stringify(updatedLinks));
     
     return Response.redirect(new URL('/admin/categories', request.url).toString(), 303);
   } catch (error) {
@@ -562,7 +571,7 @@ async function handleAddSearchEngine(request) {
   try {
     const engines = await getSearchEngines();
     engines.push({ name, urlTemplate });
-    await NAV_DB.put('search_engines', JSON.stringify(engines));
+    await globalThis.NAV_DB.put('search_engines', JSON.stringify(engines));
     
     return Response.redirect(new URL('/admin/search-engines', request.url).toString(), 303);
   } catch (error) {
@@ -587,7 +596,7 @@ async function handleEditSearchEngine(request) {
       engine.name === oldName ? { name: newName, urlTemplate } : engine
     );
     
-    await NAV_DB.put('search_engines', JSON.stringify(updatedEngines));
+    await globalThis.NAV_DB.put('search_engines', JSON.stringify(updatedEngines));
     
     return Response.redirect(new URL('/admin/search-engines', request.url).toString(), 303);
   } catch (error) {
@@ -608,7 +617,7 @@ async function handleDeleteSearchEngine(request) {
     const engines = await getSearchEngines();
     const updatedEngines = engines.filter(engine => engine.name !== name);
     
-    await NAV_DB.put('search_engines', JSON.stringify(updatedEngines));
+    await globalThis.NAV_DB.put('search_engines', JSON.stringify(updatedEngines));
     
     return Response.redirect(new URL('/admin/search-engines', request.url).toString(), 303);
   } catch (error) {
@@ -652,7 +661,7 @@ async function handleUpdateSettings(request) {
     };
     
     // 保存设置
-    await NAV_DB.put('site_settings', JSON.stringify(updatedSettings));
+    await globalThis.NAV_DB.put('site_settings', JSON.stringify(updatedSettings));
     
     return Response.redirect(new URL('/admin/settings', request.url).toString(), 303);
   } catch (error) {
@@ -670,7 +679,7 @@ async function incrementClickCount(id) {
       }
       return link;
     });
-    await NAV_DB.put('links', JSON.stringify(updatedLinks));
+    await globalThis.NAV_DB.put('links', JSON.stringify(updatedLinks));
   } catch (error) {
     console.error('增加点击量失败:', error);
   }
@@ -679,7 +688,7 @@ async function incrementClickCount(id) {
 // 获取所有链接
 async function getLinks() {
   try {
-    const linksJson = await NAV_DB.get('links');
+    const linksJson = await globalThis.NAV_DB.get('links');
     return linksJson ? JSON.parse(linksJson) : [];
   } catch (error) {
     console.error('获取链接失败:', error);
@@ -690,15 +699,18 @@ async function getLinks() {
 // 获取所有分类
 async function getCategories() {
   try {
-    const categoriesJson = await NAV_DB.get('categories');
+    const categoriesJson = await globalThis.NAV_DB.get('categories');
     return categoriesJson ? JSON.parse(categoriesJson) : [
       { name: '搜索引擎', icon: 'fa-search', isPrivate: false },
-      { name: '综合名站', icon: 'fa-link', isPrivate: false }
+      { name: '推荐站点', icon: 'fa-star', isPrivate: false },
+      { name: '综合名站', icon: 'fa-link', isPrivate: false },
+      { name: '点击榜单', icon: 'fa-fire', isPrivate: false }
     ];
   } catch (error) {
     console.error('获取分类失败:', error);
     return [
       { name: '搜索引擎', icon: 'fa-search', isPrivate: false },
+      { name: '推荐站点', icon: 'fa-star', isPrivate: false },
       { name: '综合名站', icon: 'fa-link', isPrivate: false }
     ];
   }
@@ -707,7 +719,7 @@ async function getCategories() {
 // 获取所有搜索引擎
 async function getSearchEngines() {
   try {
-    const enginesJson = await NAV_DB.get('search_engines');
+    const enginesJson = await globalThis.NAV_DB.get('search_engines');
     return enginesJson ? JSON.parse(enginesJson) : [
       { name: 'Google', urlTemplate: 'https://www.google.com/search?q={query}' },
       { name: 'Bing', urlTemplate: 'https://www.bing.com/search?q={query}' },
@@ -726,7 +738,7 @@ async function getSearchEngines() {
 // 获取网站设置
 async function getSiteSettings() {
   try {
-    const settingsJson = await NAV_DB.get('site_settings');
+    const settingsJson = await globalThis.NAV_DB.get('site_settings');
     return settingsJson ? JSON.parse(settingsJson) : {
       siteTitle: '雪人导航网',
       siteDescription: '高效实用的网站导航',
@@ -791,9 +803,20 @@ async function getFeaturedLinks(limit = 12) {
 }
 
 // 显示管理员登录页面
+async function YanZhenWX() {
+  const html = `
+  4616692055878630450
+  `;
+  
+  return new Response(html, {
+    headers: { 'Content-Type': 'text/html' }
+  });
+}
+
+// 显示管理员登录页面
 async function showAdminLogin() {
   const settings = await getSiteSettings();
-
+  
   const html = `
   <!DOCTYPE html>
   <html lang="zh-CN">
@@ -1024,13 +1047,14 @@ async function showAdminDashboard() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard" class="active"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1045,7 +1069,7 @@ async function showAdminDashboard() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
-	    <!-- 添加菜单按钮 -->
+        <!-- 添加菜单按钮 -->
         <div class="menu-toggle" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
@@ -1121,7 +1145,8 @@ async function showAdminDashboard() {
         `).join('')}
       </div>
     </div>
-	    <script>
+    
+    <script>
       // 侧边栏控制逻辑
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
@@ -1212,13 +1237,14 @@ async function showLinkManagement() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1233,7 +1259,7 @@ async function showLinkManagement() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
-	    <!-- 添加菜单按钮 -->
+        <!-- 添加菜单按钮 -->
         <div class="menu-toggle" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
@@ -1379,70 +1405,7 @@ async function showLinkManagement() {
         </form>
       </div>
     </div>
-        <script>
-      // 侧边栏控制逻辑
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      const sidebarClose = document.getElementById('sidebarClose');
-      
-      // 切换侧边栏状态
-      function toggleSidebar() {
-        sidebar.classList.toggle('sidebar-active');
-        sidebarOverlay.classList.toggle('sidebar-active');
-        
-        // 添加/移除body滚动锁定
-        if (sidebar.classList.contains('sidebar-active')) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
-      }
-      
-      // 关闭侧边栏
-      function closeSidebar() {
-        sidebar.classList.remove('sidebar-active');
-        sidebarOverlay.classList.remove('sidebar-active');
-        document.body.style.overflow = '';
-      }
-      
-      // 事件监听
-      menuToggle.addEventListener('click', toggleSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
-      sidebarClose.addEventListener('click', closeSidebar);
-      
-      // 点击侧边栏外部关闭
-      document.addEventListener('click', (event) => {
-        if (window.innerWidth > 992) return;
-        
-        const isClickInsideSidebar = sidebar.contains(event.target);
-        const isClickOnMenuToggle = menuToggle.contains(event.target);
-        
-        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 键盘ESC键关闭
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 窗口大小变化时调整
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) {
-          // 大屏幕时确保侧边栏可见
-          sidebar.classList.remove('sidebar-active');
-          sidebarOverlay.classList.remove('sidebar-active');
-          document.body.style.overflow = '';
-        } else {
-          // 小屏幕时默认隐藏
-          closeSidebar();
-        }
-      });
-    </script>
+    
     <script>
       function openEditModal(id) {
         const links = ${JSON.stringify(links)};
@@ -1466,6 +1429,56 @@ async function showLinkManagement() {
       // 点击模态框外部关闭
       document.getElementById('editModal').addEventListener('click', function(e) {
         if (e.target === this) closeEditModal();
+      });
+      
+      // 侧边栏控制逻辑（与仪表盘页面相同）
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          closeSidebar();
+        }
       });
     </script>
   </body>
@@ -1494,13 +1507,14 @@ async function showCategoryManagement() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1515,7 +1529,7 @@ async function showCategoryManagement() {
     <!-- 主内容 -->
     <div class="main-content">
       <div class="header">
-	    <!-- 添加菜单按钮 -->
+        <!-- 添加菜单按钮 -->
         <div class="menu-toggle" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
@@ -1606,70 +1620,7 @@ async function showCategoryManagement() {
         </form>
       </div>
     </div>
-        <script>
-      // 侧边栏控制逻辑
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      const sidebarClose = document.getElementById('sidebarClose');
-      
-      // 切换侧边栏状态
-      function toggleSidebar() {
-        sidebar.classList.toggle('sidebar-active');
-        sidebarOverlay.classList.toggle('sidebar-active');
-        
-        // 添加/移除body滚动锁定
-        if (sidebar.classList.contains('sidebar-active')) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
-      }
-      
-      // 关闭侧边栏
-      function closeSidebar() {
-        sidebar.classList.remove('sidebar-active');
-        sidebarOverlay.classList.remove('sidebar-active');
-        document.body.style.overflow = '';
-      }
-      
-      // 事件监听
-      menuToggle.addEventListener('click', toggleSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
-      sidebarClose.addEventListener('click', closeSidebar);
-      
-      // 点击侧边栏外部关闭
-      document.addEventListener('click', (event) => {
-        if (window.innerWidth > 992) return;
-        
-        const isClickInsideSidebar = sidebar.contains(event.target);
-        const isClickOnMenuToggle = menuToggle.contains(event.target);
-        
-        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 键盘ESC键关闭
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 窗口大小变化时调整
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) {
-          // 大屏幕时确保侧边栏可见
-          sidebar.classList.remove('sidebar-active');
-          sidebarOverlay.classList.remove('sidebar-active');
-          document.body.style.overflow = '';
-        } else {
-          // 小屏幕时默认隐藏
-          closeSidebar();
-        }
-      });
-    </script>
+    
     <script>
       function openEditCategoryModal(name, icon, isPrivate) {
         document.getElementById('editOldName').value = name;
@@ -1686,6 +1637,56 @@ async function showCategoryManagement() {
       // 点击模态框外部关闭
       document.getElementById('editCategoryModal').addEventListener('click', function(e) {
         if (e.target === this) closeEditCategoryModal();
+      });
+      
+      // 侧边栏控制逻辑（与仪表盘页面相同）
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          closeSidebar();
+        }
       });
     </script>
   </body>
@@ -1714,13 +1715,14 @@ async function showSearchEngineManagement() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -1824,70 +1826,7 @@ async function showSearchEngineManagement() {
         </form>
       </div>
     </div>
-        <script>
-      // 侧边栏控制逻辑
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      const sidebarClose = document.getElementById('sidebarClose');
-      
-      // 切换侧边栏状态
-      function toggleSidebar() {
-        sidebar.classList.toggle('sidebar-active');
-        sidebarOverlay.classList.toggle('sidebar-active');
-        
-        // 添加/移除body滚动锁定
-        if (sidebar.classList.contains('sidebar-active')) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
-      }
-      
-      // 关闭侧边栏
-      function closeSidebar() {
-        sidebar.classList.remove('sidebar-active');
-        sidebarOverlay.classList.remove('sidebar-active');
-        document.body.style.overflow = '';
-      }
-      
-      // 事件监听
-      menuToggle.addEventListener('click', toggleSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
-      sidebarClose.addEventListener('click', closeSidebar);
-      
-      // 点击侧边栏外部关闭
-      document.addEventListener('click', (event) => {
-        if (window.innerWidth > 992) return;
-        
-        const isClickInsideSidebar = sidebar.contains(event.target);
-        const isClickOnMenuToggle = menuToggle.contains(event.target);
-        
-        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 键盘ESC键关闭
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 窗口大小变化时调整
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) {
-          // 大屏幕时确保侧边栏可见
-          sidebar.classList.remove('sidebar-active');
-          sidebarOverlay.classList.remove('sidebar-active');
-          document.body.style.overflow = '';
-        } else {
-          // 小屏幕时默认隐藏
-          closeSidebar();
-        }
-      });
-    </script>
+    
     <script>
       function openEditModal(name) {
         const engines = ${JSON.stringify(engines)};
@@ -1907,6 +1846,56 @@ async function showSearchEngineManagement() {
       // 点击模态框外部关闭
       document.getElementById('editModal').addEventListener('click', function(e) {
         if (e.target === this) closeEditModal();
+      });
+      
+      // 侧边栏控制逻辑（与仪表盘页面相同）
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          closeSidebar();
+        }
       });
     </script>
   </body>
@@ -1957,6 +1946,8 @@ async function showAdminCss() {
     position: fixed;
     padding: 20px 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease;
   }
   
   .sidebar-header {
@@ -2008,17 +1999,13 @@ async function showAdminCss() {
     text-align: center;
   }
   
-  a.backhome {
-    color: white;
-    text-decoration: none;
-  }
-  
   /* 主内容区域 */
   .main-content {
     flex: 1;
     margin-left: 250px;
     padding: 30px;
     width: calc(100% - 250px);
+    transition: margin-left 0.3s ease;
   }
   
   .header {
@@ -2511,7 +2498,6 @@ async function showAdminCss() {
   @media (max-width: 992px) {
     .sidebar {
       transform: translateX(-100%);
-      transition: transform 0.3s ease;
       z-index: 1000;
       position: fixed;
       height: 100vh;
@@ -2525,7 +2511,6 @@ async function showAdminCss() {
     .main-content {
       margin-left: 0;
       width: 100%;
-      transition: margin-left 0.3s ease;
     }
     
     .menu-toggle {
@@ -2612,13 +2597,14 @@ async function showSettingsPage() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -2725,19 +2711,18 @@ async function showSettingsPage() {
         </div>
       </div>
     </div>
-	    <script>
-      // 侧边栏控制逻辑
+    
+    <script>
+      // 侧边栏控制逻辑（与仪表盘页面相同）
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
       const sidebarClose = document.getElementById('sidebarClose');
       
-      // 切换侧边栏状态
       function toggleSidebar() {
         sidebar.classList.toggle('sidebar-active');
         sidebarOverlay.classList.toggle('sidebar-active');
         
-        // 添加/移除body滚动锁定
         if (sidebar.classList.contains('sidebar-active')) {
           document.body.style.overflow = 'hidden';
         } else {
@@ -2745,19 +2730,16 @@ async function showSettingsPage() {
         }
       }
       
-      // 关闭侧边栏
       function closeSidebar() {
         sidebar.classList.remove('sidebar-active');
         sidebarOverlay.classList.remove('sidebar-active');
         document.body.style.overflow = '';
       }
       
-      // 事件监听
       menuToggle.addEventListener('click', toggleSidebar);
       sidebarOverlay.addEventListener('click', closeSidebar);
       sidebarClose.addEventListener('click', closeSidebar);
       
-      // 点击侧边栏外部关闭
       document.addEventListener('click', (event) => {
         if (window.innerWidth > 992) return;
         
@@ -2769,22 +2751,14 @@ async function showSettingsPage() {
         }
       });
       
-      // 键盘ESC键关闭
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
           closeSidebar();
         }
       });
       
-      // 窗口大小变化时调整
       window.addEventListener('resize', () => {
         if (window.innerWidth > 992) {
-          // 大屏幕时确保侧边栏可见
-          sidebar.classList.remove('sidebar-active');
-          sidebarOverlay.classList.remove('sidebar-active');
-          document.body.style.overflow = '';
-        } else {
-          // 小屏幕时默认隐藏
           closeSidebar();
         }
       });
@@ -2813,13 +2787,14 @@ async function showBackupPage() {
   <body>
     <!-- 添加遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- 侧边栏 -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-close" id="sidebarClose">
         <i class="fas fa-times"></i>
       </div>
       <div class="sidebar-header">
-        <h1><i class="fas fa-compass"></i> <a href="/" class="backhome"> 导航系统</a></h1>
+        <h1><i class="fas fa-compass"></i> 导航系统</h1>
       </div>
       <ul class="nav-links">
         <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
@@ -2866,70 +2841,7 @@ async function showBackupPage() {
         </div>
       </div>
     </div>
-        <script>
-      // 侧边栏控制逻辑
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      const sidebarClose = document.getElementById('sidebarClose');
-      
-      // 切换侧边栏状态
-      function toggleSidebar() {
-        sidebar.classList.toggle('sidebar-active');
-        sidebarOverlay.classList.toggle('sidebar-active');
-        
-        // 添加/移除body滚动锁定
-        if (sidebar.classList.contains('sidebar-active')) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
-      }
-      
-      // 关闭侧边栏
-      function closeSidebar() {
-        sidebar.classList.remove('sidebar-active');
-        sidebarOverlay.classList.remove('sidebar-active');
-        document.body.style.overflow = '';
-      }
-      
-      // 事件监听
-      menuToggle.addEventListener('click', toggleSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
-      sidebarClose.addEventListener('click', closeSidebar);
-      
-      // 点击侧边栏外部关闭
-      document.addEventListener('click', (event) => {
-        if (window.innerWidth > 992) return;
-        
-        const isClickInsideSidebar = sidebar.contains(event.target);
-        const isClickOnMenuToggle = menuToggle.contains(event.target);
-        
-        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 键盘ESC键关闭
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
-          closeSidebar();
-        }
-      });
-      
-      // 窗口大小变化时调整
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) {
-          // 大屏幕时确保侧边栏可见
-          sidebar.classList.remove('sidebar-active');
-          sidebarOverlay.classList.remove('sidebar-active');
-          document.body.style.overflow = '';
-        } else {
-          // 小屏幕时默认隐藏
-          closeSidebar();
-        }
-      });
-    </script>
+    
     <script>
       document.getElementById('backupBtn').addEventListener('click', async function() {
         try {
@@ -2963,6 +2875,56 @@ async function showBackupPage() {
           URL.revokeObjectURL(url);
         } catch (error) {
           alert('备份失败: ' + error.message);
+        }
+      });
+      
+      // 侧边栏控制逻辑（与仪表盘页面相同）
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('sidebar-active');
+        sidebarOverlay.classList.toggle('sidebar-active');
+        
+        if (sidebar.classList.contains('sidebar-active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+      
+      function closeSidebar() {
+        sidebar.classList.remove('sidebar-active');
+        sidebarOverlay.classList.remove('sidebar-active');
+        document.body.style.overflow = '';
+      }
+      
+      menuToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth > 992) return;
+        
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('sidebar-active')) {
+          closeSidebar();
+        }
+      });
+      
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          closeSidebar();
         }
       });
     </script>
@@ -3031,10 +2993,10 @@ async function handleRestore(request) {
     
     // 恢复数据到KV
     await Promise.all([
-      NAV_DB.put('site_settings', JSON.stringify(backupData.settings)),
-      NAV_DB.put('links', JSON.stringify(backupData.links)),
-      NAV_DB.put('categories', JSON.stringify(backupData.categories)),
-      NAV_DB.put('search_engines', JSON.stringify(backupData.engines))
+      globalThis.NAV_DB.put('site_settings', JSON.stringify(backupData.settings)),
+      globalThis.NAV_DB.put('links', JSON.stringify(backupData.links)),
+      globalThis.NAV_DB.put('categories', JSON.stringify(backupData.categories)),
+      globalThis.NAV_DB.put('search_engines', JSON.stringify(backupData.engines))
     ]);
     
     // 重定向回备份页面并显示成功消息
@@ -3044,7 +3006,7 @@ async function handleRestore(request) {
   }
 }
 
-// 显示前台页面 - 使用新的UI设计
+// 显示前台页面
 async function showFrontend(request) {
   const settings = await getSiteSettings();
   const categories = await getCategories();
@@ -3535,6 +3497,35 @@ async function showFrontend(request) {
         cursor: pointer;
         z-index: 100;
       }
+      
+      /* 版本信息样式 */
+      .version-info {
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        font-size: 13px;
+        text-align: center;
+      }
+      
+      .version-update {
+        color: #ff9800;
+        font-weight: bold;
+        margin-top: 5px;
+        animation: pulse 2s infinite;
+      }
+      
+      .version-error {
+        color: #f44336;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+      }
 
       /* 背景图片 */
       .banner-video {
@@ -3744,9 +3735,14 @@ async function showFrontend(request) {
     </ul>
     
     <footer class="footer">
-      <p>${settings.copyright} Powered by <a href="https://paoto.com">paoto.com</a>.</p>
-	  <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a></p>
+      <p>${settings.copyright}</p>
       <p>${settings.icpNumber}</p> 
+       <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a></p>
+      <!-- 版本信息区域 -->
+      <div class="version-info" id="versionInfo">
+        当前版本: <span id="currentVersion">v1.0.0</span>
+        <div id="updateMessage"></div>
+      </div>
     </footer>
     
     <div class="theme-switcher" id="themeToggle">
@@ -3870,6 +3866,114 @@ async function showFrontend(request) {
           }
         });
       });
+      
+      // 版本检查功能
+      const VERSION_CHECK_KEY = 'versionCheck';
+      const CHECK_INTERVAL = 6 * 60 * 60 * 1000; // 6小时检查一次
+      const CURRENT_VERSION = 'v1.0.0'; // 当前版本
+      
+      // 设置当前版本显示
+      document.getElementById('currentVersion').textContent = CURRENT_VERSION;
+      
+      // 检查新版本
+      async function checkForUpdates() {
+        try {
+          const lastCheck = localStorage.getItem(VERSION_CHECK_KEY);
+          const now = Date.now();
+          
+          // 检查频率限制
+          if (lastCheck && (now - parseInt(lastCheck)) < CHECK_INTERVAL) {
+            console.log('跳过版本检查（频率限制）');
+            return;
+          }
+          
+          // 存储最后检查时间
+          localStorage.setItem(VERSION_CHECK_KEY, now.toString());
+          
+          // 尝试GitHub API
+          let response = await fetch('https://api.github.com/repos/Shaw-fung/navsite/releases/latest', {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          
+          // 处理GitHub速率限制
+          if (response.status === 403) {
+            throw new Error('GitHub API rate limit exceeded');
+          }
+          
+          // 如果GitHub失败，尝试备用源
+          if (!response.ok) {
+            throw new Error('GitHub API failed');
+          }
+          
+          const data = await response.json();
+          const latestVersion = data.tag_name;
+          
+          // 比较版本
+          if (isNewerVersion(latestVersion, CURRENT_VERSION)) {
+            showUpdateMessage(\`有新版本可用: \${latestVersion}\`, true);
+          } else {
+            showUpdateMessage('已是最新版本', false);
+          }
+        } catch (error) {
+          console.error('版本检查失败:', error);
+          
+          // 尝试备用源
+          try {
+            const backupResponse = await fetch('https://duibi.top/navsite/version');
+            if (backupResponse.ok) {
+              const backupData = await backupResponse.json();
+              if (isNewerVersion(backupData.version, CURRENT_VERSION)) {
+                showUpdateMessage(\`有新版本可用: \${backupData.version} (备用源)\`, true);
+              } else {
+                showUpdateMessage('已是最新版本 (备用源)', false);
+              }
+            } else {
+              showUpdateMessage('新版本检查失败', false, true);
+            }
+          } catch (backupError) {
+            console.error('备用源检查失败:', backupError);
+            showUpdateMessage('新版本检查失败', false, true);
+          }
+        }
+      }
+      
+      // 版本比较函数 (简单实现)
+      function isNewerVersion(newVersion, currentVersion) {
+        // 简单比较：去除v字符后按字典序比较
+        const cleanNew = newVersion.replace(/^v/, '');
+        const cleanCurrent = currentVersion.replace(/^v/, '');
+        return cleanNew > cleanCurrent;
+      }
+      
+      // 显示更新消息
+      function showUpdateMessage(message, isUpdate = false, isError = false) {
+        const updateMessage = document.getElementById('updateMessage');
+        updateMessage.innerHTML = '';
+        
+        const messageElement = document.createElement('div');
+        if (isUpdate) {
+          messageElement.className = 'version-update';
+          messageElement.innerHTML = \`
+            \${message} 
+            <a href="https://github.com/Shaw-fung/navsite/releases" target="_blank" style="color:#ff9800;margin-left:5px;">
+              <i class="fas fa-external-link-alt"></i> 查看更新
+            </a>
+          \`;
+        } else if (isError) {
+          messageElement.className = 'version-error';
+          messageElement.textContent = message;
+        } else {
+          messageElement.textContent = message;
+          messageElement.style.color = '#4CAF50';
+        }
+        
+        updateMessage.appendChild(messageElement);
+      }
+      
+      // 页面加载后检查更新
+      setTimeout(checkForUpdates, 2000);
     </script>
   </body>
   </html>
