@@ -1,53 +1,75 @@
 // worker.js
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
+
 export default {
   async fetch(request, env) {
-    // 将 KV 绑定到全局对象
-    globalThis.NAV_DB = env.NAV_DB;
-    
-    const url = new URL(request.url);
+    try {
+      // 将 KV 绑定到全局对象
+      globalThis.NAV_DB = env.NAV_DB;
+      
+      const url = new URL(request.url);
+      
+      // 微信验证
+      if (url.pathname === '/tencent10279378791095334123.txt') {
+        return YanZhenWX();
+      }
 
-    // 处理背景图片请求
-    if (url.pathname === '/background-image') {
-      return handleBackgroundImage(request);
-    }
+      // 处理背景图片请求
+      if (url.pathname === '/background-image') {
+        return handleBackgroundImage(request);
+      }
 
-    // 处理 sea.webp 请求
-    if (url.pathname === '/static/images/sea.webp') {
-      return fetch('https://duibi.top/static/images/sea.webp');
-    }
+      // 处理 sea.webp 请求
+      if (url.pathname === '/static/images/sea.webp') {
+        return fetch('https://duibi.top/static/images/sea.webp');
+      }
 
-    // 处理 favicon.ico 请求
-    if (url.pathname === '/favicon.ico') {
-      return handleFavicon(request);
+      // 处理 favicon.ico 请求
+      if (url.pathname === '/favicon.ico') {
+        return handleFavicon(request);
+      }
+      
+      // Bing每日图片代理
+      if (url.pathname === '/bing-image') {
+        return fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1');
+      }
+      
+      // 后台管理路由
+      if (url.pathname.startsWith('/admin')) {
+        return handleAdminRoutes(request);
+      }
+      
+      // 处理API请求
+      if (url.pathname.startsWith('/api')) {
+        return handleApiRoutes(request);
+      }
+      
+      // 数据库备份
+      if (url.pathname === '/admin/backup') {
+        return handleBackup(request);
+      }
+      
+      // 数据库还原
+      if (url.pathname === '/admin/restore' && request.method === 'POST') {
+        return handleRestore(request);
+      }
+      
+      // 静态资源处理
+      const assetResponse = await getAssetFromKV({
+        request,
+        waitUntil(promise) {
+          return promise;
+        }
+      }, {
+        ASSET_NAMESPACE: env.__STATIC_CONTENT,
+        ASSET_MANIFEST: env.__STATIC_CONTENT_MANIFEST,
+      });
+      
+      return assetResponse;
+    } catch (e) {
+      // 前台页面
+      return showFrontend(request);
     }
-    
-    // Bing每日图片代理
-    if (url.pathname === '/bing-image') {
-      return fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1');
-    }
-    
-    // 后台管理路由
-    if (url.pathname.startsWith('/admin')) {
-      return handleAdminRoutes(request);
-    }
-    
-    // 处理API请求
-    if (url.pathname.startsWith('/api')) {
-      return handleApiRoutes(request);
-    }
-    
-    // 数据库备份
-    if (url.pathname === '/admin/backup') {
-      return handleBackup(request);
-    }
-    
-    // 数据库还原
-    if (url.pathname === '/admin/restore' && request.method === 'POST') {
-      return handleRestore(request);
-    }
-    
-    // 前台页面
-    return showFrontend(request);
   }
 };
 
