@@ -1,15 +1,14 @@
-name = "nav-website"
+name = "nav-site"  # 替换为你的 Worker 名称
 main = "worker.js"  # 入口文件路径
-compatibility_date = "2025-07-17"
+compatibility_date = "2025-07-13"
 
 [build]
-command = "npm run build"
-upload_dir = "public"
+command = "echo 'No build needed'"
 
-[[kv_namespaces]]
-binding = "NAV_DB"
-id = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_PREVIEW_KV_ID"
+[env.production]
+workers_dev = true
 
-[pages]
-bucket = "public"
+# 如果你使用 KV 存储，添加以下配置
+kv_namespaces = [
+  { binding = "NAV_DB", id = "a6d1c77c73c54c3fbcbf8a1830726f7e" }
+]
