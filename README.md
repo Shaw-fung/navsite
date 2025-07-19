@@ -1,10 +1,23 @@
 # NavSite
 
-## 一个基于cloudflare worker，cloudflare kv搭建的带后台管理导航站。
+## 项目简介
+NavSite 是一个基于 Cloudflare Worker 和 Cloudflare KV 快速搭建的高交互导航站，支持在线后台管理，适合个人或团队快速部署自己的网址导航。  
+项目地址：[Shaw-fung/navsite](https://github.com/Shaw-fung/navsite)
 
-****
+---
 
-### 截图展示：
+## 功能特色
+- **极简部署**：无需服务器，依托 Cloudflare Worker 搭建，资源消耗低，维护便捷。
+- **数据持久化**：所有导航数据存储在 Cloudflare KV，安全可靠，支持高并发读取。
+- **后台管理**：自带美观易用的后台管理系统，支持分类管理、添加、修改、删除导航项。
+- **多主题切换**：主页支持明亮/暗黑模式一键切换，界面美观，适应不同使用习惯。
+- **自定义域名**：可绑定自己的域名，打造专属导航站点。
+- **安全登录**：支持后台账号密码登录，初次登录后建议及时修改密码以确保安全。
+- **移动端适配**：页面适配各类主流设备，手机、平板、PC均有良好体验。
+
+---
+
+## 项目截图
 
 ****
 
@@ -24,44 +37,39 @@
 
 ![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/admin-dashboard.jpg?raw=true)
 
-****
+---
 
-### 安装步骤：
+## 快速部署指南
 
-1、登录CloudFlare，点击左侧“存储和数据库”，进入“KV”，点击右上角创建KV命名空间（Create Instance），输入命名空间名称（如：MyHomePage_DB），点击创建。
+### 1. 创建 KV 命名空间
+登录 Cloudflare，进入 **存储和数据库 > KV**，创建一个新的命名空间（如：MyHomePage_DB）。
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/1.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/2.jpg?raw=true)
+### 2. 新建 Worker 服务
+依次点击 **计算 > Workers 和 Pages**，点击右上角“创建”，选择“从 Hello World！开始”，新建 Worker 项目。
 
-2、依次点击左侧“计算 （Workers）”、Workers 和 Pages，在点击右上角的创建按钮，点击“从Hello World！开始”后面的“开始项目”，然后进行修改或不修改名称，点击部署。
+### 3. 替换 Worker 代码
+进入 Worker 编辑页面，将默认代码替换为本项目 `worker.js` 的全部内容，然后点击部署。
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/3.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/4.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/5.jpg?raw=true)
+### 4. 绑定 KV 命名空间
+在 Worker 服务的绑定设置中，添加 KV 命名空间绑定，变量名填写 `NAV_DB`，选择刚才创建的命名空间。
 
-3、部署成功后，点击右上角的编辑代码，然后将原始代码全部删除，粘贴进本项目开源的worker.js的所有代码，然后点击部署。
+### 5. 绑定自定义域名（可选）
+为 Worker 服务绑定自己的域名，提升访问体验。
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/6.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/7.jpg?raw=true)
+### 6. 访问及后台管理
+完成以上步骤后，用绑定域名或 Worker 默认域名访问你的导航站。  
+后台默认登录账号：admin  
+默认密码：admin123  
+请第一时间进入后台修改账号密码！
 
-4、部署成功后，点击返回，再点击“绑定”，然后点击“添加绑定”，弹出对话框，选择KV命名空间，最后点击添加绑定。
+### 详细安装步骤演示：[查看](https://github.com/Shaw-fung/navsite/install.md)。
+---
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/8.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/9.jpg?raw=true)![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/10.jpg?raw=true)
+## 常见问题
 
-5、开始进行KV命名空间绑定：变量名称填“NAV_DB”，KV命名空间选择我们之前创建的命名空间名称（如：MyHomePage_DB），然后点击“添加绑定”。
+如遇到部署问题或功能疑问，欢迎提交 [Issues](https://github.com/Shaw-fung/navsite/issues/new)。
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/11.jpg?raw=true)
+---
 
-6、最后一步，因为一些特殊原因咱们无法直接访问workers.dev域名，建议绑定我们自己的域名，操作见下图：
 
-![avatar](https://github.com/Shaw-fung/navsite/blob/main/Screenshot/12.jpg?raw=true)
-
-****
-
-程序部署成功后就可以使用我们绑定的域名或者自带的xx.xx.workers.dev进行访问了。
-
-默认后台登录用户名是：admin
-
-默认密码是：admin123
-
-请登录后台后自行修改用户名或者密码。
-
-****
-
-如果有问题，欢迎提交提问讨论，[我要提交问题](https://github.com/Shaw-fung/navsite/issues/new)！
+> 技术让导航更简单，欢迎 Star & Fork！
