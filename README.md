@@ -62,7 +62,7 @@ NavSite 是一个基于 Cloudflare Worker 和 Cloudflare KV 快速搭建的高�
 默认密码：admin123  
 请第一时间进入后台修改账号密码！
 
-### 详细安装步骤演示：[查看](https://github.com/Shaw-fung/navsite/install.md)。
+### 详细安装步骤演示：[查看](https://github.com/Shaw-fung/navsite/blob/main/install.md)。
 ---
 
 ## 常见问题
