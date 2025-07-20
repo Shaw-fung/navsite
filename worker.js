@@ -3481,9 +3481,9 @@ async function showFrontend(request) {
       
       /* 版本信息样式 */
       .version-info {
-        margin-top: 15px;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.1);
+       // margin-top: 15px;
+       // padding: 10px;
+        background: rgba(255, 255, 255, 0);
         border-radius: 8px;
         font-size: 13px;
         text-align: center;
@@ -3721,7 +3721,7 @@ async function showFrontend(request) {
        
       <!-- 版本信息区域 -->
       <div class="version-info" id="versionInfo">
-        <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a>.</p>当前版本: <span id="currentVersion">v1.0.0</span>
+        <p>程序已开源：<a href="https://github.com/Shaw-fung/navsite">Shaw-fung/navsite</a>.当前版本: <span id="currentVersion">v1.0.0</span></p>
         <div id="updateMessage"></div>
       </div>
     </footer>
