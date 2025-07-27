@@ -3321,6 +3321,7 @@ async function showFrontend(request) {
       }
 
       img {
+		border-radius: 9px;
         max-width: 100%;
         max-height: 100%;
     }
