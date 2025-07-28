@@ -3320,7 +3320,7 @@ async function showFrontend(request) {
         border-radius: 9px;
       }
 
-      img {
+      .icon img {
 		border-radius: 9px;
         max-width: 100%;
         max-height: 100%;
