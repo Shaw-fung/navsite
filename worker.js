@@ -3612,6 +3612,12 @@ async function showFrontend(request) {
             width: 95%;
         }
       }
+	  
+      @media (min-width: 767px) {
+        .nav-bar {
+            display: none;
+        }
+      }
     </style>
   </head>
   <body>
