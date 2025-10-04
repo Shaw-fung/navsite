@@ -3526,6 +3526,15 @@ async function showFrontend(request) {
           width: 100%;
           height: 100vh;
       }
+	  
+	  .top-cover {
+          width: 100%;
+          height: 50%;
+          position: absolute;
+          top: 0;
+          z-index: 10;
+          background-image: linear-gradient(var(--bg-color) 0%, rgba(255, 255, 255, 0) 30%);
+}
 
       .bottom-cover {
           width: 100%;
@@ -3643,6 +3652,7 @@ async function showFrontend(request) {
     
     <div class="banner-video">
       <img id="background-image" src="/background-image" alt="背景图片">
+	  <div class="top-cover"></div>
       <div class="bottom-cover"></div>
     </div>
     
