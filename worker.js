@@ -1560,7 +1560,7 @@ async function showCategoryManagement() {
             <input type="text" id="name" name="name" required>
           </div>
           <div class="form-group">
-            <label for="icon">图标</label>
+            <label for="icon">图标(Font Awesome类名)</label>
             <input type="text" id="icon" name="icon" placeholder="fa-folder">
           </div>
           <div class="form-group">
@@ -1586,7 +1586,7 @@ async function showCategoryManagement() {
             <input type="text" id="editNewName" name="newName" required>
           </div>
           <div class="form-group">
-            <label for="editIcon">图标</label>
+            <label for="editIcon">图标(Font Awesome类名)</label>
             <input type="text" id="editIcon" name="icon">
           </div>
           <div class="form-group">
