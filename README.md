@@ -1,7 +1,7 @@
 # NavSite
 
 ## 项目简介
-NavSite 是一个基于 Cloudflare Worker 和 Cloudflare KV 快速搭建的高交互导航站，支持在线后台管理，适合个人或团队快速部署自己的网址导航。  
+Cloudflare Nav Site 是一个基于 Cloudflare Worker 和 Cloudflare KV 快速搭建的高交互导航站，支持在线后台管理，适合个人或团队快速部署自己的网址导航。  
 项目地址：[Shaw-fung/navsite](https://github.com/Shaw-fung/navsite)
 
 ---
